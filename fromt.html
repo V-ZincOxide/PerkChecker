@@ -133,6 +133,19 @@
             background: #d0d0d0;
         }
 
+        .btn-link {
+            background: transparent;
+            color: #667eea;
+            border: 1px solid #667eea;
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+
+        .btn-link:hover {
+            background: #f0f0f0;
+            transform: none;
+        }
+
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -304,7 +317,7 @@
                  4. GitHub Pages 사용시: 이미지도 함께 업로드하세요
                  ======================================== -->
             <h1>
-                <!-- <img src="logo.jpg" alt="로고" class="logo"> -->
+                <img src="logo.jpg" alt="로고" class="logo">
                 🎫 행사 굿즈 체크 시스템
             </h1>
             
@@ -326,7 +339,12 @@
             </div>
 
             <div id="searchSection" class="setup-section hidden">
-                <label for="regNumber">등록 번호:</label>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <label for="regNumber" style="margin-bottom: 0;">등록 번호:</label>
+                    <button class="btn-link" onclick="editApiUrl()" style="font-size: 14px; padding: 8px 12px; width: auto;">
+                        ⚙️ URL 수정
+                    </button>
+                </div>
                 <input type="text" id="regNumber" placeholder="등록 번호를 입력하세요" onkeypress="handleEnter(event)">
                 <button class="btn-primary" onclick="searchAttendee()">검색</button>
             </div>
@@ -402,6 +420,15 @@
             document.getElementById('searchSection').classList.remove('hidden');
             showStatus('API URL이 저장되었습니다!', 'success');
             setTimeout(() => hideStatus(), 2000);
+        }
+
+        function editApiUrl() {
+            document.getElementById('searchSection').classList.add('hidden');
+            document.getElementById('resultSection').classList.remove('show');
+            document.getElementById('setupSection').classList.remove('hidden');
+            document.getElementById('regNumber').value = '';
+            currentAttendee = null;
+            hideStatus();
         }
 
         function handleEnter(event) {
