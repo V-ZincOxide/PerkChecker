@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>행사 굿즈 체크 시스템</title>
+    <style>
+        /* ========================================
+           🎨 CUSTOMIZATION SECTION - START
+           ======================================== */
+        
+        /* Main background gradient colors */
+        :root {
+            --bg-gradient-start: #667eea;  /* 배경 그라디언트 시작 색상 */
+            --bg-gradient-end: #764ba2;    /* 배경 그라디언트 끝 색상 */
+            --primary-color: #667eea;      /* 주요 버튼 색상 */
+            --primary-hover: #5568d3;      /* 버튼 호버 색상 */
+        }
+        
+        /* ========================================
+           🎨 CUSTOMIZATION SECTION - END
+           ======================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 24px;
+            text-align: center;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* 로고 이미지 스타일 */
+        .logo {
+            height: 40px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .setup-section {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+            touch-action: manipulation;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            touch-action: manipulation;
+            margin-top: 12px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-section {
+            display: none;
+        }
+
+        .result-section.show {
+            display: block;
+        }
+
+        .attendee-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .attendee-info h2 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 24px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .info-label {
+            color: #666;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .tier-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .tier-1 { background: #ffd700; color: #000; }
+        .tier-2 { background: #c0c0c0; color: #000; }
+        .tier-3 { background: #cd7f32; color: #fff; }
+
+        .perks-section h3 {
+            color: #333;
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+
+        .perk-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+            touch-action: manipulation;
+        }
+
+        .perk-item.received {
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+
+        .perk-item.disabled {
+            opacity: 0.5;
+            background: #f5f5f5;
+        }
+
+        .perk-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .checkbox-wrapper {
+            position: relative;
+            width: 32px;
+            height: 32px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .checkbox-wrapper input[type="checkbox"]:disabled {
+            cursor: not-allowed;
+        }
+
+        .status-message {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .status-loading {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .setup-instructions {
+            background: #e3f2fd;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #1565c0;
+        }
+
+        .setup-instructions ol {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .setup-instructions li {
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <!-- ========================================
+                 📝 CUSTOMIZATION: 페이지 제목 및 로고
+                 
+                 로고 추가 방법:
+                 1. 이미지 파일을 HTML 파일과 같은 폴더에 넣기
+                    예: logo.jpg를 index.html과 같은 위치에 저장
+                 
+                 2. src="logo.jpg"에서 파일명을 자신의 파일명으로 변경
+                    예: src="my-event-logo.png"
+                 
+                 3. 로고를 사용하지 않으려면 <img> 태그 전체를 삭제하세요
+                 
+                 4. GitHub Pages 사용시: 이미지도 함께 업로드하세요
+                 ======================================== -->
+            <h1>
+                <!-- <img src="logo.jpg" alt="로고" class="logo"> -->
+                🎫 행사 굿즈 체크 시스템
+            </h1>
+            
+            <div id="setupSection" class="setup-section">
+                <div class="setup-instructions">
+                    <strong>설정 방법:</strong>
+                    <ol>
+                        <li>구글 시트를 만들고 다음 열을 추가하세요: Registration Number, Name, Tier, Received Perk 1, Received Perk 2, Received Perk 3</li>
+                        <li>확장 프로그램 → Apps Script로 이동</li>
+                        <li>제공된 스크립트를 붙여넣고 웹 앱으로 배포</li>
+                        <li>액세스 권한을 "모든 사용자"로 설정하고 배포 URL을 복사</li>
+                        <li>아래에 URL을 붙여넣으세요</li>
+                    </ol>
+                </div>
+                
+                <label for="apiUrl">Google Apps Script 웹 앱 URL:</label>
+                <input type="text" id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec">
+                <button class="btn-primary" onclick="saveApiUrl()">저장 및 계속</button>
+            </div>
+
+            <div id="searchSection" class="setup-section hidden">
+                <label for="regNumber">등록 번호:</label>
+                <input type="text" id="regNumber" placeholder="등록 번호를 입력하세요" onkeypress="handleEnter(event)">
+                <button class="btn-primary" onclick="searchAttendee()">검색</button>
+            </div>
+
+            <div id="statusMessage" class="status-message hidden"></div>
+
+            <div id="resultSection" class="result-section">
+                <div class="attendee-info">
+                    <h2 id="attendeeName"></h2>
+                    <div class="info-row">
+                        <span class="info-label">등록 번호:</span>
+                        <span class="info-value" id="attendeeRegNum"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">티어:</span>
+                        <span class="info-value" id="attendeeTier"></span>
+                    </div>
+                </div>
+
+                <div class="perks-section">
+                    <h3>배포할 굿즈:</h3>
+                    <div id="perksList"></div>
+                </div>
+
+                <button class="btn-secondary" onclick="resetSearch()">다른 참가자 검색</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ========================================
+           ⚙️ CUSTOMIZATION SECTION - START
+           ======================================== */
+        
+        // 굿즈 개수 설정 (기본: 3개)
+        const TOTAL_PERKS = 3;
+        
+        // 굿즈 이름 커스터마이징 (선택사항)
+        // 기본값을 사용하려면 null로 두세요
+        const PERK_NAMES = {
+            1: null,  // null이면 "굿즈 1" 사용, 또는 "티셔츠" 같이 원하는 이름 입력
+            2: null,  // 예: "에코백"
+            3: null   // 예: "스티커 세트"
+        };
+        
+        /* ========================================
+           ⚙️ CUSTOMIZATION SECTION - END
+           ======================================== */
+
+        let API_URL = '';
+        let currentAttendee = null;
+
+        // Load saved API URL on page load
+        window.onload = function() {
+            const saved = localStorage.getItem('perkCheckerApiUrl');
+            if (saved) {
+                API_URL = saved;
+                document.getElementById('apiUrl').value = saved;
+                document.getElementById('setupSection').classList.add('hidden');
+                document.getElementById('searchSection').classList.remove('hidden');
+            }
+        };
+
+        function saveApiUrl() {
+            const url = document.getElementById('apiUrl').value.trim();
+            if (!url) {
+                showStatus('유효한 URL을 입력해주세요', 'error');
+                return;
+            }
+            API_URL = url;
+            localStorage.setItem('perkCheckerApiUrl', url);
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('searchSection').classList.remove('hidden');
+            showStatus('API URL이 저장되었습니다!', 'success');
+            setTimeout(() => hideStatus(), 2000);
+        }
+
+        function handleEnter(event) {
+            if (event.key === 'Enter') {
+                searchAttendee();
+            }
+        }
+
+        async function searchAttendee() {
+            const regNumber = document.getElementById('regNumber').value.trim();
+            if (!regNumber) {
+                showStatus('등록 번호를 입력해주세요', 'error');
+                return;
+            }
+
+            showStatus('검색 중...', 'loading');
+
+            try {
+                const response = await fetch(`${API_URL}?action=get&regNumber=${encodeURIComponent(regNumber)}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    showStatus(data.error === 'Attendee not found' ? '참가자를 찾을 수 없습니다' : data.error, 'error');
+                    return;
+                }
+
+                currentAttendee = data;
+                displayAttendee(data);
+                hideStatus();
+            } catch (error) {
+                showStatus('데이터베이스 연결 오류. 설정을 확인해주세요.', 'error');
+                console.error(error);
+            }
+        }
+
+        function displayAttendee(data) {
+            document.getElementById('attendeeName').textContent = data.name;
+            document.getElementById('attendeeRegNum').textContent = data.registrationNumber;
+            
+            const tierBadge = `<span class="tier-badge tier-${data.tier}">${data.tier}티어</span>`;
+            document.getElementById('attendeeTier').innerHTML = tierBadge;
+
+            const perksList = document.getElementById('perksList');
+            perksList.innerHTML = '';
+
+            for (let i = 1; i <= TOTAL_PERKS; i++) {
+                const shouldReceive = i <= data.tier;
+                const received = data[`receivedPerk${i}`] === 'TRUE' || data[`receivedPerk${i}`] === true;
+                
+                const perkItem = document.createElement('div');
+                perkItem.className = `perk-item ${received ? 'received' : ''} ${!shouldReceive ? 'disabled' : ''}`;
+                
+                // 커스텀 이름이 있으면 사용, 없으면 기본 "굿즈 N" 사용
+                const perkName = PERK_NAMES[i] || `굿즈 ${i}`;
+                
+                perkItem.innerHTML = `
+                    <span class="perk-name">${perkName}</span>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" 
+                               id="perk${i}" 
+                               ${received ? 'checked' : ''} 
+                               ${!shouldReceive ? 'disabled' : ''}
+                               onchange="updatePerk(${i}, this.checked)">
+                    </div>
+                `;
+                
+                perksList.appendChild(perkItem);
+            }
+
+            document.getElementById('resultSection').classList.add('show');
+            document.getElementById('searchSection').classList.add('hidden');
+        }
+
+        async function updatePerk(perkNumber, checked) {
+            showStatus('업데이트 중...', 'loading');
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        action: 'update',
+                        regNumber: currentAttendee.registrationNumber,
+                        perkNumber: perkNumber,
+                        received: checked
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showStatus('업데이트 완료!', 'success');
+                    setTimeout(() => hideStatus(), 1500);
+                    
+                    // Update the visual state
+                    const perkItem = document.getElementById(`perk${perkNumber}`).closest('.perk-item');
+                    if (checked) {
+                        perkItem.classList.add('received');
+                    } else {
+                        perkItem.classList.remove('received');
+                    }
+                } else {
+                    showStatus(data.error || '업데이트 실패', 'error');
+                    document.getElementById(`perk${perkNumber}`).checked = !checked;
+                }
+            } catch (error) {
+                showStatus('데이터베이스 업데이트 오류', 'error');
+                document.getElementById(`perk${perkNumber}`).checked = !checked;
+                console.error(error);
+            }
+        }
+
+        function resetSearch() {
+            document.getElementById('regNumber').value = '';
+            document.getElementById('resultSection').classList.remove('show');
+            document.getElementById('searchSection').classList.remove('hidden');
+            currentAttendee = null;
+            hideStatus();
+        }
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message status-${type}`;
+            statusEl.classList.remove('hidden');
+        }
+
+        function hideStatus() {
+            document.getElementById('statusMessage').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
